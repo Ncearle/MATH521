@@ -1,0 +1,159 @@
+\documentclass[10pt,letterpaper]{scrartcl}
+\usepackage{amsfonts,amsmath,amssymb}
+\usepackage{dsfont,fontawesome}
+\usepackage{braket,mathtools,siunitx}
+\usepackage[hidelinks]{hyperref}
+\usepackage{textcomp,url}
+\usepackage{xcolor,graphicx,tikz,pgfplots}
+\usetikzlibrary{arrows}
+\pgfplotsset{compat=1.12}
+\usepackage{listings,enumerate}
+\renewcommand\theenumi{\textbf{\arabic{enumi}}}
+\usepackage{booktabs,tabularx,longtable,multicol}
+\usepackage[inner=2cm,outer=2cm,top=2cm,bottom=2.3cm]{geometry}
+
+\pagestyle{empty}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+
+\newcommand{\dx}{\;\mathrm{d}x}
+\newcommand{\ds}{\;\mathrm{d}s}
+\renewcommand{\div}{\operatorname{div}}
+
+\begin{document}
+
+\begin{minipage}{.2\textwidth}
+\includegraphics[width=42pt]{ubc-logo.png}
+\end{minipage}
+\hfill
+\begin{minipage}{.75\textwidth}
+\setlength{\parskip}{6pt}
+\begin{flushright}
+{
+\sffamily
+\textbf{MATH521: Numerical Analysis of Partial Differential Equations}\\
+Winter 2018/19, Term 2
+
+Due Date: Thursday, 10 January 2019\\
+Timm Treskatis
+}
+\end{flushright}
+\end{minipage}
+
+\section*{Homework Assignment 1}
+
+Please submit the following files as indicated below: \hfill \faFileCodeO \: source code \hfill \faFilePdfO \: PDF file \hfill \faFilePictureO \: image file \hfill \faFileMovieO \: video file
+
+\paragraph*{Question 1 $\vert$ 2 marks $\vert$ \faFilePdfO}
+
+Use Definition 1.1.1 to determine the type of (non)linearity of the following PDEs:
+\begin{enumerate}[(a)]
+\item
+\begin{minipage}{.5\linewidth}
+\begin{equation*}
+\frac{\partial u}{\partial t} - xe^{-t} \frac{\partial^2 u}{\partial x^2} = xe^{-t}
+\end{equation*}
+\end{minipage}
+\begin{minipage}{.5\linewidth}
+\vspace*{3em}
+\hrulefill
+\end{minipage}
+\item
+\begin{minipage}{.5\linewidth}
+\begin{equation*}
+\frac{\partial u}{\partial x} + u \frac{\partial u}{\partial y} = 0
+\end{equation*}
+\end{minipage}
+\begin{minipage}{.5\linewidth}
+\vspace*{3em}
+\hrulefill
+\end{minipage}
+\item
+\begin{minipage}{.5\linewidth}
+\begin{equation*}
+\cos\left(\frac{\partial^2 u}{\partial x_1^2}\right) + \sin\left(\frac{\partial^2 u}{\partial x_2^2}\right) = 1
+\end{equation*}
+\end{minipage}
+\begin{minipage}{.5\linewidth}
+\vspace*{3em}
+\hrulefill
+\end{minipage}
+\item
+\begin{minipage}{.5\linewidth}
+\begin{equation*}
+\frac{\partial u}{\partial t} + u \frac{\partial u}{\partial x} + \frac{\partial^3 u}{\partial x^3} - (t^2 + x^2) = 0
+\end{equation*}
+\end{minipage}
+\begin{minipage}{.5\linewidth}
+\vspace*{3em}
+\hrulefill
+\end{minipage}
+\end{enumerate}
+
+\paragraph*{Question 2 $\vert$ 3 marks $\vert$ \faFileCodeO}
+In this first assignment we set up a core component for an implementation of the finite difference method, which we will build upon next week. I recommend to use \textsf{GNU Octave / MATLAB} for our first assignments, as you will have extra translation work to do if you prefer to use another programming language.
+
+\begin{enumerate}[(a)]
+\item Write a function \texttt{meshRectangle} which meshes a two-dimensional rectangular domain. The function should take two input variables
+\begin{description}
+\item[\texttt{x}:] a $1\times 4$ array, which defines the coordinates of the rectangle $\left[ \mathtt{x(1)},\mathtt{x(2)} \right]\times \left[ \mathtt{x(3)},\mathtt{x(4)} \right]$ (NB: this notation is a Cartesian product of two intervals)
+\item[\texttt{N}:] a $1 \times 2$ array, which specifies that the domain is to be divided into \texttt{N(1)} subintervals in $x_1$-direction and \texttt{N(2)} subintervals in $x_2$-direction.
+\end{description}
+Furthermore, \texttt{meshRectangle} should return one output variable
+\begin{description}
+\item[\texttt{msh}:] a structure with fields
+\begin{description}
+\item[\texttt{X1}, \texttt{X2}:] both arrays of size $(\texttt{N(2)}+1) \times (\texttt{N(1)}+1)$ that contain the $x_1$ or $x_2$ components, respectively, of each grid point
+\item[\texttt{N}:] a copy of the input variable of the same name
+\item[\texttt{h}:] an array of size $1 \times 2$ which contains the width of the subintervals in $x_1$ and $x_2$-direction
+\end{description}
+\end{description}
+\item Complete and run the program \texttt{hw1}.
+
+Check that all details are correct, such as the exact number of subintervals in each direction and the orientation of the graph. Add labels to all three axes.
+\item \faFilePictureO{} Save the graph in a vector graphics format (recommended) or a high quality raster graphics format.
+\end{enumerate}
+\emph{Hint:} In \textsf{GNU Octave / MATLAB}, the commands \texttt{linspace}, \texttt{meshgrid}, \texttt{xlabel}, \texttt{ylabel} and \texttt{zlabel} may be helpful. Use the commands \texttt{help linspace}, \texttt{help meshgrid} etc. for more information and examples of use.
+
+\paragraph*{Submission instructions for this and all future assignments:} Please upload your solutions on \textsf{Canvas}. Do not include your name anywhere so that our marking will be fully blinded. You may
+\begin{itemize}
+\item edit the TEX file to add your solutions and upload the compiled PDF,
+\item annotate this PDF document electronically with a stylus, or
+\item upload a scanned paper copy with your handwritten answers. If you scan your solutions, please use a reasonable resolution (300-400 dpi) and make sure the scans are not oriented sideways or upside down.
+\end{itemize}
+
+Additionally, for all computational questions, please include
+\begin{itemize}
+\item Well-commented source code in its native file format, e.g. \texttt{hw1.m} and \texttt{meshRectangle.m}.
+\item Any extra files of graphs etc as instructed. If you choose to edit the TEX file to submit your answers, then it's ok if the graphs are included in the compiled PDF.
+\end{itemize}
+Please upload all files separately, as \textsf{Canvas} doesn't support ZIP archives. 
+
+Always use proper citation for any references you consult, e.g. explain what technique you found on page X in textbook Y or what idea you got from a discussion with classmate Z. You may use the text box for comments for this purpose when you submit your assignment.
+
+Remember that you may skip up to two assignments, as only your best ten marks (out of twelve assignments) will be counted.
+
+\paragraph*{Your Learning Progress $\vert$ \faFilePdfO}
+What is the one most important thing that you have learnt from this assignment?
+
+\vspace*{3mm}
+\hrulefill
+
+\vspace*{3mm}
+\hrulefill
+
+\vspace*{3mm}
+\hrulefill
+
+What is the most substantial new insight that you have gained from this course this week? Any \emph{aha moment}?
+
+\vspace*{3mm}
+\hrulefill
+
+\vspace*{3mm}
+\hrulefill
+
+\vspace*{3mm}
+\hrulefill
+
+\end{document}
