@@ -1,3 +1,6 @@
+%% MATH 521 HW1
+% Nicholas Earle
+
 close all; clc;
 
 % sample function

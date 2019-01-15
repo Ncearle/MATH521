@@ -15,4 +15,3 @@ h = [h1, h2];
 msh = struct('X1', X1, 'X2', X2, 'N', N, 'h', h);
 
 end
-
