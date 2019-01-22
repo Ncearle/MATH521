@@ -3,4 +3,6 @@ function [u] = msh2vec(U, msh)
 
 u = reshape(fliplr(U'), (msh.N(1)-1)*(msh.N(2)-1), 1);
 
+% u = reshape(U', (msh.N(1)-1)*(msh.N(2)-1), 1);
+
 end 
