@@ -1,5 +1,4 @@
 %% MATH 521 - HW3
-% Nicholas Earle
 
 close all; clear; clc;
 
@@ -14,6 +13,15 @@ g = @(x1, x2) cos(2*pi*x1).*cos(6*pi*x2);
 [A, b] = discretisePoisson(f, g, msh);
 u = vec2msh(A\b, msh); 
 
+figure();
+surf(u);
+xlabel('X');
+ylabel('Y');
+zlabel('u');
+title('u');
 
+figure();
+spy(A);
+title('Sparsity of A matrix');
 
 
