@@ -1,0 +1,298 @@
+\documentclass[10pt,letterpaper]{scrartcl}
+\usepackage{amsfonts,amsmath,amssymb}
+\usepackage{cancel}
+\usepackage{dsfont,fontawesome}
+\usepackage{braket,mathtools,siunitx}
+\usepackage[hidelinks]{hyperref}
+\usepackage{textcomp,url}
+\usepackage{xcolor,graphicx,tikz,pgfplots}
+\definecolor{shadecolor}{rgb}{0.9,0.9,0.9}
+\usetikzlibrary{arrows}
+\pgfplotsset{compat=1.12}
+\usepackage{listings,enumerate}
+\usepackage{booktabs,tabularx,longtable,multicol}
+\usepackage[inner=2cm,outer=2cm,top=2cm,bottom=2.3cm]{geometry}
+
+\pagestyle{empty}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+
+\newcommand{\dx}{\;\mathrm{d}x}
+\newcommand{\ds}{\;\mathrm{d}s}
+\renewcommand{\div}{\operatorname{div}}
+
+\begin{document}
+
+\begin{minipage}{.2\textwidth}
+\includegraphics[width=42pt]{ubc-logo.png}
+\end{minipage}
+\hfill
+\begin{minipage}{.75\textwidth}
+\setlength{\parskip}{6pt}
+\begin{flushright}
+{
+\sffamily
+\textbf{MATH521: Numerical Analysis of Partial Differential Equations}\\
+Winter 2018/19, Term 2
+
+Due Date: Thursday, 31 January 2019\\
+Timm Treskatis
+}
+\end{flushright}
+\end{minipage}
+
+\section*{Homework Assignment 4: Applied Flavour}
+
+Please submit the following files as indicated below: \hfill \faFileCodeO \: source code \hfill \faFilePdfO \: PDF file \hfill \faFilePictureO \: image file \hfill \faFileMovieO \: video file
+
+\paragraph*{Question 1 $\vert$ 1 mark $\vert$ \faFilePdfO}
+
+Let $u \in C^3(\bar{\Omega})$ with a bounded domain $\Omega$. For simplicity and with no real loss of generality we assume that $\Omega \subset \mathds{R}$ (because even in higher dimensions the partial derivatives are just ordinary 1D directional derivatives).
+
+In Lemma 2.2.6 we showed that the one-sided difference quotients 
+\begin{equation*}
+\partial^{+h} u(x) = \frac{u(x+h)-u(x)}{h} \qquad \text{and} \qquad \partial^{-h} u(x) = \frac{u(x)-u(x-h)}{h}
+\end{equation*}
+are a first-order consistent approximation of $u'(x)$. Use the same Taylor-series technique to show that these difference quotients actually approximate $u'(x) - Du''(x)$ ``better'', namely with second-order consistency, than they approximate $u'(x)$. Here $D\in \mathds{R}$ is a certain number which may depend on $h$.
+
+
+\begin{equation*}
+    u(x+h) \approx u(x) + hu'(x) + \frac{h^2}{2} u''(x) + \frac{h^3}{6} u'''(x)
+\end{equation*}
+\begin{equation*}
+    u(x-h) \approx u(x) - hu'(x) + \frac{h^2}{2} u''(x) - \frac{h^3}{6} u'''(x)
+\end{equation*}
+\begin{equation*}
+    \partial^{+h}u(x) = \frac{\cancel{u(x)}+\cancel{h}u'(x)+\frac{h^{\cancel{2}}}{u}u''(x)+\frac{h^{\cancelto{2}{3}}}{6}u'''(x)-\cancel{u(x)}}{\cancel{h}} = u'(x)+\frac{h}{2}u''(x)+\frac{h^2}{6}u'''(x)
+\end{equation*}
+\begin{equation*}
+    \partial^{-h}u(x) = \frac{\cancel{u(x)}-\cancel{[u(x)}-\cancel{h}u'(x)+\frac{h^{\cancel{2}}}{u}u''(x)-\frac{h^{\cancelto{2}{3}}}{6}u'''(x)]}{\cancel{h}} = u'(x)-\frac{h}{2}u''(x)+\frac{h^2}{6}u'''(x)
+\end{equation*}
+
+Putting these into the form above we get:
+\begin{equation*}
+    \partial^{\pm h}u(x) - \frac{h^2}{6}u'''(x) = u'(x) - Du''(x) \quad where \quad D = \mp \frac{h}{2}
+\end{equation*}
+
+\newpage
+
+\paragraph*{Question 2 $\vert$ 4 marks $\vert$ \faFilePdfO}
+
+Today we will solve the steady advection-diffusion equation in 1D
+\begin{align*}
+au' - D u'' &= f \qquad \text{in } ]0,1[\\
+u(0) &= 0\\
+u(1) &= 0
+\end{align*}
+with a constant diffusivity $D>0$ and a divergence-free, i.e. constant advection velocity $a \in \mathds{R}$.
+
+A finite-difference discretisation on the $N+1$ grid points
+\begin{equation*}
+x = 0, h, 2h, 3h, \dots, (N-1)h, 1,
+\end{equation*}
+(where $h = 1/N$) leads to a linear system of the form
+\begin{equation*}
+\left( A^h + D^h \right) u^h = f^h
+\end{equation*}
+where the $(N-1) \times (N-1)$ matrices $A^h$ and $D^h$ are discretisations of the advective and diffusive terms, respectively, $u^h = (u^h_1, \dots , u^h_{N-1})^\top$ the vector of approximate function values on the grid points and $f^h (f(h), \dots , f((N-1)h))^\top$.
+
+\begin{enumerate}[(a)]
+\item We have already encountered the discrete Laplacian a number of times and know that
+\begin{equation*}
+D^h = \frac{D}{h^2} \left(
+\begin{array}{cccc}
+2 & -1\\
+-1 & 2 & -1\\
+& & \ddots\\
+& & -1 & 2
+\end{array}
+\right)
+\end{equation*}
+
+Discretise the transport term with the upwind\footnote{Upwind differencing uses a one-sided difference quotient. The two-point stencil covers the point $x$ itself and the nearest point in `upwind' direction, where the flow is coming from.} differencing scheme
+\begin{equation*}
+u'(x) \approx
+\begin{dcases}
+\partial^{+h}u(x) & \text{if } a(x)<0 \text{ (flow } \longleftarrow \text{)}\\
+\partial^{-h}u(x) & \text{if } a(x)>0 \text{ (flow } \longrightarrow \text{)}
+\end{dcases}
+\end{equation*}
+What is the matrix $A^h_u$ that you obtain from this scheme? Show that it is a weakly chained diagonally dominant $L$-matrix.
+
+If $a(x) < 0$ we get:
+\begin{equation*}
+A^h_u = \frac{a}{h} \left(
+\begin{array}{cccc}
+1 & -1\\
+& 1 & -1\\
+& & \ddots\\
+& & & 1
+\end{array}
+\right)
+\end{equation*}
+
+If $a(x) > 0$ we get:
+\begin{equation*}
+A^h_u = \frac{a}{h} \left(
+\begin{array}{cccc}
+1\\
+-1 & 1\\
+& & \ddots\\
+& & -1 & 1
+\end{array}
+\right)
+\end{equation*}
+
+More generally:
+\begin{equation*}
+A^h_u = \frac{a}{h} \left(
+\begin{array}{cccc}
+1 & -(\frac{1}{2}-\frac{1}{2}sgn(a))\\
+-(\frac{1}{2}+\frac{1}{2}sgn(a)) & 1 & -(\frac{1}{2}-\frac{1}{2}sgn(a))\\
+& \ddots & \ddots\\
+& & -(\frac{1}{2}+\frac{1}{2}sgn(a)) & 1
+\end{array}
+\right)
+\end{equation*}
+
+\newpage
+
+To show that it is indeed a weakly chained diagonally dominant L-matrix it must meet the following conditions:
+\begin{enumerate}[(1)]
+    \item A is WDD
+    \begin{equation*}
+    |a_{ii}| = 1; \: \Sigma_{j\ne i}|a_{ij}| = 1\: or\: 0
+    \end{equation*}
+    \item First or last row is SDD depending on the sign of $a$
+    \item For any row there is a chain of non-zero indices that lead from a WDD row to a SDD row. That is for $a(x) > 0$ the diagonal is all 1 and the entries on the diagonal below are -1, and for $a(x) < 0$ all of the entries on the diagonal above the main are -1 with 1 on the main.
+    \item All of the off-diagonal entries are negative while the diagonal entries are positive, which is the case.
+\end{enumerate}
+
+\mbox{}
+\vfill
+
+We already know that $D^h$ is a weakly chained diagonally dominant $L$-matrix, and since the sum of two weakly chained diagonally dominant $L$-matrices is yet another weakly chained diagonally dominant $L$-matrix (right?), this discretisation of the advection-diffusion problem is guaranteed to be monotone.
+
+\newpage
+
+\item What matrix $A^h_c$ do you obtain if you use the central difference quotient
+\begin{equation*}
+u'(x) \approx \partial^h u(x)
+\end{equation*}
+instead?
+
+\begin{equation*}
+    \partial^h u(x) = \frac{u(x+h) - u(x-h)}{2h}
+\end{equation*}
+
+\begin{equation*}
+A^h_c = \frac{a}{2h} \left(
+\begin{array}{ccccc}
+0 & 1\\
+-1 & 0 & 1\\
+& \ddots & \ddots & \ddots\\
+& & -1 & 0 & 1\\
+& & & -1 & 0\\
+\end{array}
+\right)
+\end{equation*}
+
+
+          
+\vfill
+
+\item Even though the matrix $A^h_c$ does not satisfy the $M$-criterion from Lemma 2.2.19, chances are that the sum $A^h_c + D^h$ still does under certain circumstances. Determine the range of grid spacings $h>0$ for which $A^h_c + D^h$ is a weakly chained diagonally dominant $L$-matrix, indeed.
+
+\emph{Hint:} The identity
+\begin{equation*}
+\lvert \alpha + \beta \rvert + \lvert \alpha - \beta \rvert = 2\max\Set{\lvert \alpha \rvert,\lvert \beta \rvert}
+\end{equation*}
+may be useful.
+
+\begin{equation*}
+A^h_c + D^h = \left(
+\begin{array}{cccc}
+\frac{2}{h^2} & \left(\frac{-1}{h^2} + \frac{1}{2h}\right)\\
+\left(\frac{-1}{h^2} - \frac{1}{2h}\right) & \frac{2}{h^2} & \left(\frac{-1}{h^2} + \frac{1}{2h}\right)\\
+& \ddots & \ddots\\
+& & \left(\frac{-1}{h^2} - \frac{1}{2h}\right) & \frac{2}{h^2}\\
+\end{array}
+\right)
+\end{equation*}
+
+Given $h > 0$ we need the following for a weakly chained digonally dominant L-matrix:
+\begin{enumerate}
+    \item All off-diagonal entries are negative and all diagonal entries are positive:
+        \begin{equation*}
+            \frac{2}{h^2} > 0 \quad \checkmark
+        \end{equation*}
+        \begin{equation*}
+            \frac{-1}{h^2} - \frac{1}{2h} \leq 0 \quad \checkmark
+        \end{equation*}
+        \begin{equation*}
+            \frac{-1}{h^2} + \frac{1}{2h} \leq 0 \quad => \quad h \leq 2
+        \end{equation*}
+    \item $A^h_c+D^h$ is WDD
+        \begin{equation*}
+            \left|\frac{-1}{h^2} - \frac{1}{2h}\right| + \left|\frac{-1}{h^2} + \frac{1}{2h}\right| \leq \left|\frac{2}{h^2}\right|
+        \end{equation*}
+        Using the identity above we get that:
+        \begin{equation*}
+            \left|\frac{-2}{h^2}\right| \leq \left|\frac{2}{h^2}\right| \quad \checkmark \qquad \left|\frac{2}{2h}\right| \leq \left|\frac{2}{h^2}\right| \quad => \quad h \leq 2 
+        \end{equation*}
+
+
+\vfill
+
+\newpage
+    \item One row of $A^h_c+D^h$ is SDD, either the first or last
+        \begin{equation*}
+           \left| \frac{-1}{h^2} + \frac{1}{2h}\right| < \left|\frac{2}{h^2}\right| \quad => \quad h < 6
+        \end{equation*}
+        \begin{equation*}
+           \left| \frac{-1}{h^2} - \frac{1}{2h}\right| < \left|\frac{2}{h^2}\right| \quad => \quad h < 2
+        \end{equation*}
+    
+    \item Finally a chain must be present as above, which it is because the under-diagonal and over-diagonal entries can never be zero given $h < 2$
+    
+    So, the range of grid spacing such that $A^h_c+D^h$ is a weakly chained diagonally dominant L-matrix is:
+    \[0 < h < 2\]
+    
+\end{enumerate}
+
+\mbox{}
+
+\newpage
+
+\item Download the file \texttt{advection\textunderscore diffusion.m} which implements the upwind and central differencing schemes for this advection-diffusion problem. The code is intentionally obfuscated so that you still have to do (a) to (c) yourself!  Run the program with different values of the parameters, to see what happens if the $M$-criterion is satisfied and what if not.
+
+Based on your observations, your answers to the previous questions and your knowledge from Chapter 2.2, think about one advantage and one disadvantage of each of the two discretisation schemes. Use the relevant technical terminology.
+
+\begin{center}
+\begin{tabular}{lcc}
+\toprule
+ & Central Differencing & Upwind Differencing\\
+\toprule
+$\oplus$ & Retains accuracy over a much  & May not need a set BC on a side \\
+& larger range of diffusivity & depending on the 'wind' direction
+&  \phantom{\rule{1cm}{1cm}} & \phantom{\rule{1cm}{1cm}}\\
+\midrule
+$\ominus$ & Requires BC to be  & Loses accuracy as \\
+& set on all sides & 'wind' value increases
+& \phantom{\rule{1cm}{1cm}} & \phantom{\rule{1cm}{1cm}}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\end{enumerate}
+
+\paragraph*{Your Learning Progress $\vert$ 0 marks, but -1 mark if unanswered $\vert$ \faFilePdfO}
+What is the one most important thing that you have learnt from this assignment?
+
+\emph{How much more accurate the central differencing was compared to the upwinding scheme. }
+
+What is the most substantial new insight that you have gained from this course this week? Any \emph{aha moment}?
+
+\emph{How the 'hat' functions are actually applicable to FEM, and indeed how we use quadrature to approximate the hat functions and the values about the grid.}
+
+\end{document}

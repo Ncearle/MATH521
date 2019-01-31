@@ -1,0 +1,179 @@
+\documentclass[10pt,letterpaper]{scrartcl}
+\usepackage{amsfonts,amsmath,amssymb}
+\usepackage{dsfont,fontawesome}
+\usepackage{braket,mathtools,siunitx}
+\usepackage[hidelinks]{hyperref}
+\usepackage{textcomp,url}
+\usepackage{xcolor,graphicx,tikz,pgfplots}
+\definecolor{shadecolor}{rgb}{0.9,0.9,0.9}
+\usetikzlibrary{arrows}
+\pgfplotsset{compat=1.12}
+\usepackage{listings,enumerate}
+\usepackage{booktabs,tabularx,longtable,multicol}
+\usepackage[inner=2cm,outer=2cm,top=2cm,bottom=2.3cm]{geometry}
+
+\pagestyle{empty}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+
+\newcommand{\dx}{\;\mathrm{d}x}
+\newcommand{\ds}{\;\mathrm{d}s}
+\renewcommand{\div}{\operatorname{div}}
+
+\begin{document}
+
+\begin{minipage}{.2\textwidth}
+\includegraphics[width=42pt]{ubc-logo.png}
+\end{minipage}
+\hfill
+\begin{minipage}{.75\textwidth}
+\setlength{\parskip}{6pt}
+\begin{flushright}
+{
+\sffamily
+\textbf{MATH521: Numerical Analysis of Partial Differential Equations}\\
+Winter 2018/19, Term 2
+
+Due Date: Thursday, 31 January 2019\\
+Timm Treskatis
+}
+\end{flushright}
+\end{minipage}
+
+\section*{Homework Assignment 4: Applied Flavour}
+
+Please submit the following files as indicated below: \hfill \faFileCodeO \: source code \hfill \faFilePdfO \: PDF file \hfill \faFilePictureO \: image file \hfill \faFileMovieO \: video file
+
+\paragraph*{Question 1 $\vert$ 1 mark $\vert$ \faFilePdfO}
+
+Let $u \in C^3(\bar{\Omega})$ with a bounded domain $\Omega$. For simplicity and with no real loss of generality we assume that $\Omega \subset \mathds{R}$ (because even in higher dimensions the partial derivatives are just ordinary 1D directional derivatives).
+
+In Lemma 2.2.6 we showed that the one-sided difference quotients 
+\begin{equation*}
+\partial^{+h} u(x) = \frac{u(x+h)-u(x)}{h} \qquad \text{and} \qquad \partial^{-h} u(x) = \frac{u(x)-u(x-h)}{h}
+\end{equation*}
+are a first-order consistent approximation of $u'(x)$. Use the same Taylor-series technique to show that these difference quotients actually approximate $u'(x) - Du''(x)$ ``better'', namely with second-order consistency, than they approximate $u'(x)$. Here $D\in \mathds{R}$ is a certain number which may depend on $h$.
+
+\newpage
+
+\paragraph*{Question 2 $\vert$ 4 marks $\vert$ \faFilePdfO}
+
+Today we will solve the steady advection-diffusion equation in 1D
+\begin{align*}
+au' - D u'' &= f \qquad \text{in } ]0,1[\\
+u(0) &= 0\\
+u(1) &= 0
+\end{align*}
+with a constant diffusivity $D>0$ and a divergence-free, i.e. constant advection velocity $a \in \mathds{R}$.
+
+A finite-difference discretisation on the $N+1$ grid points
+\begin{equation*}
+x = 0, h, 2h, 3h, \dots, (N-1)h, 1,
+\end{equation*}
+(where $h = 1/N$) leads to a linear system of the form
+\begin{equation*}
+\left( A^h + D^h \right) u^h = f^h
+\end{equation*}
+where the $(N-1) \times (N-1)$ matrices $A^h$ and $D^h$ are discretisations of the advective and diffusive terms, respectively, $u^h = (u^h_1, \dots , u^h_{N-1})^\top$ the vector of approximate function values on the grid points and $f^h (f(h), \dots , f((N-1)h))^\top$.
+
+\begin{enumerate}[(a)]
+\item We have already encountered the discrete Laplacian a number of times and know that
+\begin{equation*}
+D^h = \frac{D}{h^2} \left(
+\begin{array}{cccc}
+2 & -1\\
+-1 & 2 & -1\\
+& & \ddots\\
+& & -1 & 2
+\end{array}
+\right)
+\end{equation*}
+
+Discretise the transport term with the upwind\footnote{Upwind differencing uses a one-sided difference quotient. The two-point stencil covers the point $x$ itself and the nearest point in `upwind' direction, where the flow is coming from.} differencing scheme
+\begin{equation*}
+u'(x) \approx
+\begin{dcases}
+\partial^{+h}u(x) & \text{if } a(x)<0 \text{ (flow } \longleftarrow \text{)}\\
+\partial^{-h}u(x) & \text{if } a(x)>0 \text{ (flow } \longrightarrow \text{)}
+\end{dcases}
+\end{equation*}
+What is the matrix $A^h_u$ that you obtain from this scheme? Show that it is a weakly chained diagonally dominant $L$-matrix.
+
+\newpage
+
+\mbox{}
+\vfill
+
+We already know that $D^h$ is a weakly chained diagonally dominant $L$-matrix, and since the sum of two weakly chained diagonally dominant $L$-matrices is yet another weakly chained diagonally dominant $L$-matrix (right?), this discretisation of the advection-diffusion problem is guaranteed to be monotone.
+
+\newpage
+
+\item What matrix $A^h_c$ do you obtain if you use the central difference quotient
+\begin{equation*}
+u'(x) \approx \partial^h u(x)
+\end{equation*}
+instead?
+          
+\vfill
+
+\item Even though the matrix $A^h_c$ does not satisfy the $M$-criterion from Lemma 2.2.19, chances are that the sum $A^h_c + D^h$ still does under certain circumstances. Determine the range of grid spacings $h>0$ for which $A^h_c + D^h$ is a weakly chained diagonally dominant $L$-matrix, indeed.
+
+\emph{Hint:} The identity
+\begin{equation*}
+\lvert \alpha + \beta \rvert + \lvert \alpha - \beta \rvert = 2\max\Set{\lvert \alpha \rvert,\lvert \beta \rvert}
+\end{equation*}
+may be useful.
+
+\vfill
+
+\newpage
+
+\mbox{}
+
+\newpage
+
+\item Download the file \texttt{advection\textunderscore diffusion.m} which implements the upwind and central differencing schemes for this advection-diffusion problem. The code is intentionally obfuscated so that you still have to do (a) to (c) yourself!  Run the program with different values of the parameters, to see what happens if the $M$-criterion is satisfied and what if not.
+
+Based on your observations, your answers to the previous questions and your knowledge from Chapter 2.2, think about one advantage and one disadvantage of each of the two discretisation schemes. Use the relevant technical terminology.
+
+\begin{center}
+\begin{tabular}{lcc}
+\toprule
+& Central Differencing & Upwind Differencing\\
+\toprule
+$\oplus$ \\
+&  \phantom{\rule{7cm}{3cm}} & \phantom{\rule{7cm}{3cm}}\\
+\midrule
+$\ominus$ & \\
+& \phantom{\rule{7cm}{3cm}} & \phantom{\rule{7cm}{3cm}}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\end{enumerate}
+
+\paragraph*{Your Learning Progress $\vert$ 0 marks, but -1 mark if unanswered $\vert$ \faFilePdfO}
+What is the one most important thing that you have learnt from this assignment?
+
+% These lines are just here for the folks who submit handwritten answers. As you seem to type up your answers, just delete the lines :)
+\vspace*{3mm}
+\hrulefill
+
+\vspace*{3mm}
+\hrulefill
+
+\vspace*{3mm}
+\hrulefill
+
+What is the most substantial new insight that you have gained from this course this week? Any \emph{aha moment}?
+
+\vspace*{3mm}
+\hrulefill
+
+\vspace*{3mm}
+\hrulefill
+
+\vspace*{3mm}
+\hrulefill
+
+\end{document}
