@@ -86,7 +86,7 @@ M = spalloc(msh.np, msh.np, 6*msh.np);
 Mloc = [2, 1, 1; 1, 2, 1; 1, 1, 2];     % Local mass matrix
 
 for i = 1:msh.nt
-    M(msh.T(1:3, i), msh.T(1:3, i)) = M(msh.T(1:3, i), msh.T(1:3, i)) + Mloc;    
+    M(msh.T(1:3, i), msh.T(1:3, i)) = M(msh.T(1:3, i), msh.T(1:3, i)) + msh.A(i)/12 * Mloc;    
 end
 
 % complete mass matrix

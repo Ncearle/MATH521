@@ -4,6 +4,7 @@
 \usepackage{braket,mathtools,siunitx}
 \usepackage[hidelinks]{hyperref}
 \usepackage{textcomp,url}
+\usepackage{cancel}
 \usepackage{xcolor,graphicx,tikz,pgfplots}
 \definecolor{shadecolor}{rgb}{0.9,0.9,0.9}
 \usetikzlibrary{arrows}
@@ -71,13 +72,67 @@ for $i,j = 1,\dots ,N$. $N$ is the number of effective degrees of freedom, i.e. 
 
 Note that since the domain is assumed to be a polygon, we can cover it exactly with a triangulation $\mathcal{T}^h$ such that $\Omega = \Omega^h$ (there is no mismatch on the boundary).
 
-\newpage
 
+\bigskip
+First we must find the weak formulation of the linear elasticity problem:
+
+    \[\int_\Omega (-c\Delta u + au - f)vdx = 0\]
+    \[-c\int_\Omega \Delta uv \dx + a\int_\Omega uv\dx - \int_\Omega fv\dx = 0\]
+    \[\cancelto{0}{-c\int_{\partial\Omega} \frac{\partial u}{\partial n}v \ds} + c\int_\Omega \nabla u \cdot \nabla v\dx + a\int_\Omega uv\dx = \int_\Omega fv\dx\]
+
+Which leaves the weak formulation, given $f \in H^{-1}(\Omega)$, find $u \in H_0^1(\Omega)$ such that all test functions $v \in H_0^1(\Omega)$
+\[c\int_\Omega \nabla u \cdot \nabla v \dx + a\int_\Omega uv\dx = \langle f, v\rangle_{H^{-1}(\Omega),H^1_0(\Omega)}\]
+
+\newpage
+Now if we choose a basis $(\phi_i^h)_{i=1}^N$ of $V^h \subset V$ we can then define:
+\[u^h = \sum_{j=1}^N u_j^h\phi_j^h \qquad v^h = \sum_{j=1}^N v^h(x^j)\phi_j^h\]
+Subbing this into the weak formulation using the Galerkin approximation
+\begin{align*}
+    B(u^h, v^h) &= \langle f, v^h \rangle_{V^*, V},\qquad \forall v^h \in V^h \\
+    \sum_{j=1}^N B(\phi_j^h, \phi_i^h) u_j^h &= \langle f, \phi_j^h \rangle_{H^{-1},H_0^1},\qquad \forall i \in \{1,\dotso,N\} \\
+    \sum_{j=1}^N \Big( c\underbrace{\int_\Omega \nabla \phi_j^h \cdot \nabla \phi_i^h \dx}_{k_{ij}^h} + a \underbrace{\int_\Omega \phi_j^h\phi_i^h\dx}_{m_{ij}^h} \Big) u_j^h &= \sum_{j=1}^N \underbrace{\int_\Omega f \cdot \phi_j^h \dx}_{f_j^h} , \qquad \forall i \in \{1,\dotso,N\}
+\end{align*}
+Where,
+\[\sum_{j=1}^N k_{ij}^h = K^h \qquad \sum_{j=1}^N m_{ij}^h = M^h \qquad \sum_{j=1}^N u_j^h = \vec{u}^h \qquad \sum_{j=1}^N f_j^h = \vec{f}^h\]
+
+\bigskip
+Leaving us with:
+\[\left(cK^h + aM^h\right) \vec{u}^h = \vec{f}^h\]
 \mbox{}
 
 \newpage
 \item Show that the matrix $cK^h + aM^h$ of this linear system is symmetric positive definite. Is $M^h$ an $M$-matrix?
 \end{enumerate}
+
+$cK^h + aM^h$ is positive definite if either $K^h$ or $M^h$ is positive definite and the other is at least positive semi-definite, that is using the definition $u^TAu > 0$ and the distributive properties of matrices. It is also true that the sum of positive semi-definite matrices results in a positive definite matrix if there remains no zeros on the diagonal. It can now be shown that both $K^h$ and $M^h$ are both positive definite matrices resulting from the sums of positive semi-definite matrices.
+
+\begin{equation*}
+    M^h = \sum_T M_T^h \quad \text{where} \quad M_T^h = \frac{|T|}{12}
+    \underbrace{\begin{bmatrix} 
+    2 & 1 & 1 \\ 
+    1 & 2 & 1 \\ 
+    1 & 1 & 2 
+    \end{bmatrix}}_\text{PD} \xrightarrow{} 
+    \underbrace{\left[
+    \begin{array}{cccccccc}
+    & \\
+    & 2 & & 1 & & 1 &\\
+    & \\
+    & 1 & & 2 & & 1 &\\
+    & \\
+    & 1 & & 1 & & 2 &\\
+    &\\
+    \end{array}
+    \right]}_\text{PSD}
+\end{equation*}
+
+Each individual $M_T$ matrix is positive definite and becomes positive semi-definite when mapped to the corresponding vertices in the full domain, then summing all of the $M_T^h$ matrices fills in the diagonal leaving us with a positive definite matrix. The same applies to the $K_T$ matrices except that each individual matrix is positive semi-definite, as it is defined in 2.3.9. Now that both $M^h$ and $K^h$ are positive definite matrices, multiplying them by positive real constants, $a$ and $c$ doesn't change that fact, and so the resulting sum is also positive definite.
+
+$M^h$ is \underline{not} an $M$-matrix because all of the entries are positive. $M$-matrices require that the off-diagonal entries be negative. 
+
+\bigskip
+Note: I apologise for the wordy answer, I wasn't sure how to prove this with mathy notation (if my explanation does in fact prove it at all)
+
 \newpage
 
 \paragraph*{Question 2 $\vert$ 3 marks $\vert$ \faFileCodeO}
@@ -107,25 +162,10 @@ Complete the main function and the \texttt{assembleMass} subfunction. (Optional:
 \paragraph*{Your Learning Progress $\vert$ 0 marks, but -1 mark if unanswered $\vert$ \faFilePdfO}
 What is the one most important thing that you have learnt from this assignment?
 
-% These lines are just here for the folks who submit handwritten answers. As you seem to type up your answers, just delete the lines :)
-\vspace*{3mm}
-\hrulefill
-
-\vspace*{3mm}
-\hrulefill
-
-\vspace*{3mm}
-\hrulefill
+\emph{Matlab has a built-in function for pretty much everything, and they are very specific in how they are to be used.}
 
 What is the most substantial new insight that you have gained from this course this week? Any \emph{aha moment}?
 
-\vspace*{3mm}
-\hrulefill
-
-\vspace*{3mm}
-\hrulefill
-
-\vspace*{3mm}
-\hrulefill
+\emph{That I very much prefer the applied stuff compared to the analytical or theoretical. Both are usually very confusing to me, and require a lot of extra time just convincing myself of the math.}
 
 \end{document}
