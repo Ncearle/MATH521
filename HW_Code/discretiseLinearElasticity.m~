@@ -58,14 +58,14 @@ fbar = assembleLoad(f, msh);
 [Pf, PD, uD] = eliminateDirichletBC(g, GammaD, msh);
 
 % contributions from points with prescribed Dirichlet data
-kD = Pf * Kbar * PD' * uD;
-mD = Pf * Mbar * PD' * uD;
+kD = Pf * Kbar * PD' * g;
+mD = Pf * Mbar * PD' * g;
 % 
 % reduced system for the free points only
 K = Pf * Kbar * Pf';
 M = Pf * Mbar * Pf';
 A = -c*K + a*M;
-b = Pf*fbar + c*kD - a*mD;
+b = Pf*fbar;
 end
 
 function Kbar = assembleStiffness(msh)
