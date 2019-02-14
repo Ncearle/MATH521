@@ -39,18 +39,18 @@ function Mbar = discretiseLinearElasticity(msh)
 
 % edge vectors
 msh.D32 = msh.P(:,msh.T(3,:)) - msh.P(:,msh.T(2,:));
-msh.D13 = ???
-msh.D21 = ???
+msh.D13 = msh.P(:,msh.T(1,:)) - msh.P(:,msh.T(3,:));
+msh.D21 = msh.P(:,msh.T(2,:)) - msh.P(:,msh.T(1,:));
 
 % row vector of triangle areas
-msh.A = ???
+msh.A = 1/2 * (msh.D13(1,:) .* msh.D21(2,:) - msh.D21(1,:) .* msh.D13(2,:));
 % = [|T_1|, |T_2|, |T_3|, ..., |T_nt|]
 
 % number of points
-msh.np = ???
+msh.np = length(msh.P);
 
 % number of triangles
-msh.nt = ???
+msh.nt = length(msh.T);
 
 % -------------------------------------------------------------------------
 % ASSEMBLE THE DISCRETE SYSTEM
@@ -82,10 +82,15 @@ function Mbar = assembleMass(msh)
 %ASSEMBLEMASS Assembles the complete mass matrix including all boundary
 %points, discretised with linear finite elements
 
-???
+M = spalloc(msh.np, msh.np, 6*msh.np);
+Mloc = [2, 1, 1; 1, 2, 1; 1, 1, 2];     % Local mass matrix
+
+for i = 1:msh.nt
+    M(msh.T(1:3, i), msh.T(1:3, i)) = M(msh.T(1:3, i), msh.T(1:3, i)) + msh.A(i)/12 * Mloc;    
+end
 
 % complete mass matrix
-Mbar = ???
+Mbar = M;
 end
 
 % function qf = assembleLoad(f, msh)
