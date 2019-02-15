@@ -1,0 +1,114 @@
+\documentclass[10pt,letterpaper]{scrartcl}
+\usepackage{amsfonts,amsmath,amssymb}
+\usepackage{dsfont,fontawesome}
+\usepackage{braket,mathtools,siunitx}
+\usepackage[hidelinks]{hyperref}
+\usepackage{textcomp,url}
+\usepackage{xcolor,graphicx,tikz,pgfplots}
+\definecolor{shadecolor}{rgb}{0.9,0.9,0.9}
+\usetikzlibrary{arrows}
+\pgfplotsset{compat=1.12}
+\usepackage{listings,enumerate}
+\usepackage{booktabs,tabularx,longtable,multicol}
+\usepackage[inner=2cm,outer=2cm,top=2cm,bottom=2.3cm]{geometry}
+
+\pagestyle{empty}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+
+\newcommand{\dx}{\;\mathrm{d}x}
+\newcommand{\ds}{\;\mathrm{d}s}
+\renewcommand{\div}{\operatorname{div}}
+
+\begin{document}
+
+\begin{minipage}{.2\textwidth}
+\includegraphics[width=42pt]{ubc-logo.png}
+\end{minipage}
+\hfill
+\begin{minipage}{.75\textwidth}
+\setlength{\parskip}{6pt}
+\begin{flushright}
+{
+\sffamily
+\textbf{MATH521: Numerical Analysis of Partial Differential Equations}\\
+Winter 2018/19, Term 2
+
+Due Date: Thursday, 28 February 2019\\
+Timm Treskatis
+}
+\end{flushright}
+\end{minipage}
+
+\section*{Homework Assignment 7}
+
+Please submit the following files as indicated below: \hfill \faFileCodeO \: source code \hfill \faFilePdfO \: PDF file \hfill \faFilePictureO \: image file \hfill \faFileMovieO \: video file
+
+\paragraph*{5 marks $\vert$ \faFilePdfO}
+
+Let $D>0$, $a\in\mathds{R}^2$, $r\geq 0$ and $f\in L^2(\Omega)$, where $\Omega\subset \mathds{R}^2$ is a convex, polygonal domain.
+
+We use conforming linear finite elements with exact integration to solve the steady diffusion-advection-reaction problem
+\begin{align*}
+-D \Delta u + \div(au) + ru &= f && \text{in } \Omega\\
+u &= 0 && \text{on } \partial\Omega.
+\end{align*}
+(Recall that the assumption of homogeneous boundary conditions is no loss of generality, since any inhomogeneous boundary conditions could be subtracted from $u$ to obtain the same PDE with homogeneous boundary conditions but a new source term.)
+
+Follow the methodology from pp~67--68 in our notes to show that the numerical solution $u^h$ converges to $u$ at a linear rate in the $H^1$-norm and at a quadratic rate in the $L^2$-norm, provided that $u \in H^2(\Omega)$:
+\begin{align}
+\lVert u^h - u \rVert_{H^1(\Omega)} &\leq c h \lVert \nabla^2 u \rVert_{L^2(\Omega)}\\
+\lVert u^h - u \rVert_{L^2(\Omega)} &\leq c h^2 \lVert \nabla^2 u \rVert_{L^2(\Omega)}.
+\end{align}
+
+\emph{Hints:}
+\begin{enumerate}
+\item To show that the nonsymmetric bilinear form of this elliptic operator is coercive in the $H^1$-norm, prove and then use that
+\begin{equation}
+\int\limits_\Omega (a\cdot \nabla u)v \dx = - \int\limits_\Omega (a\cdot \nabla v)u \dx \quad \text{for all } u,v \in H^1_0(\Omega).
+\end{equation}
+\item You may assume that
+\begin{equation}
+\lVert u \rVert_{H^2(\Omega)} \leq c \lVert f \rVert_{L^2(\Omega)}.
+\end{equation}
+\end{enumerate}
+
+\newpage
+
+\mbox{}
+
+\newpage
+
+\mbox{}
+
+\newpage
+
+\mbox{}
+
+\vfill
+
+\paragraph*{Your Learning Progress $\vert$ 0 marks, but -1 mark if unanswered $\vert$ \faFilePdfO}
+What is the one most important thing that you have learnt from this assignment?
+
+% These lines are just here for the folks who submit handwritten answers. As you seem to type up your answers, just delete the lines :)
+\vspace*{3mm}
+\hrulefill
+
+\vspace*{3mm}
+\hrulefill
+
+\vspace*{3mm}
+\hrulefill
+
+What is the most substantial new insight that you have gained from this course this week? Any \emph{aha moment}?
+
+\vspace*{3mm}
+\hrulefill
+
+\vspace*{3mm}
+\hrulefill
+
+\vspace*{3mm}
+\hrulefill
+
+\end{document}
