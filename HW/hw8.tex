@@ -1,0 +1,79 @@
+\documentclass[10pt,letterpaper]{scrartcl}
+\usepackage{amsfonts,amsmath,amssymb}
+\usepackage{dsfont,fontawesome}
+\usepackage{braket,mathtools,siunitx}
+\usepackage[hidelinks]{hyperref}
+\usepackage{textcomp,url}
+\usepackage{xcolor,graphicx,tikz,pgfplots}
+\definecolor{shadecolor}{rgb}{0.9,0.9,0.9}
+\usetikzlibrary{arrows}
+\pgfplotsset{compat=1.12}
+\usepackage{listings,enumerate}
+\usepackage{booktabs,tabularx,longtable,multicol}
+\usepackage[inner=2cm,outer=2cm,top=2cm,bottom=2.3cm]{geometry}
+
+\pagestyle{empty}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+
+\newcommand{\dx}{\;\mathrm{d}x}
+\newcommand{\ds}{\;\mathrm{d}s}
+\renewcommand{\div}{\operatorname{div}}
+
+\begin{document}
+
+\begin{minipage}{.2\textwidth}
+\includegraphics[width=42pt]{ubc-logo.png}
+\end{minipage}
+\hfill
+\begin{minipage}{.75\textwidth}
+\setlength{\parskip}{6pt}
+\begin{flushright}
+{
+\sffamily
+\textbf{MATH521: Numerical Analysis of Partial Differential Equations}\\
+Winter 2018/19, Term 2
+
+Due Date: Thursday, 7 March 2019\\
+Timm Treskatis
+}
+\end{flushright}
+\end{minipage}
+
+\section*{Homework Assignment 8}
+
+Please submit the following files as indicated below: \hfill \faFileCodeO \: source code \hfill \faFilePdfO \: PDF file \hfill \faFilePictureO \: image file \hfill \faFileMovieO \: video file
+
+\paragraph*{5 marks $\vert$ \faFilePdfO}
+
+Spend about six hours working on your project and then document your progress here! You may wish to write up a little report that you can later re-use for your written submission. This assignment shall give you an opportunity to receive feedback on your work. Please address all of the following questions:
+\begin{enumerate}[(a)]
+\item Think about what you have learnt in this course so far. What applies to your project? Remember to always use proper terminology.
+\item Do some research on some aspect of your project we have not covered in this course. E.g. if you are solving a nonlinear problem for your project, find out how to apply iterative methods such as Newton's method to this PDE. If your project involves numerical computations, begin with the implementation in \textsf{FEniCS} or your software of choice.
+\item What are you planning to do next? Do you have any questions on how to proceed?
+\end{enumerate}
+
+\emph{Hint:} If you are working on a time-dependent problem, I suggest to replace the time derivative with a reactive term for the purpose of this assignment (this is how we will solve these equations!). E.g. instead of the equation
+\begin{equation*}
+\frac{\partial u}{\partial t} - \Delta u  + u^3 = f
+\end{equation*}
+consider
+\begin{equation*}
+au - \Delta u  + u^3 = f
+\end{equation*}
+with some $a > 0$.
+
+\paragraph*{Your Learning Progress $\vert$ 0 marks, but -1 mark if unanswered $\vert$ \faFilePdfO}
+
+What is the most substantial new insight that you have gained from this course this week? Any \emph{aha moment}?
+
+\vspace*{3mm}
+\hrulefill
+
+\vspace*{3mm}
+\hrulefill
+
+\vspace*{3mm}
+\hrulefill
+
+\end{document}

@@ -1,24 +1,17 @@
 """
-FEniCS tutorial demo program: Poisson equation with Dirichlet conditions.
-Test problem is chosen to give an exact solution at all nodes of the mesh.
-
-  -Laplace(u) = f    in the unit square
-            u = u_D  on the boundary
-
-  u_D = 1 + x^2 + 2y^2
-    f = -6
+FEniCS tutorial demo program: transport equation with Dirichlet conditions.
 """
 
+from __future__ import print_function
 from dolfin import *
-# from __future__ import print_function
-from fenics import *
 
 # Create mesh and define function space
-mesh = UnitSquareMesh(8, 8)
+N = 50 # 100 200 400 800
+mesh = RectangleMesh(Point(0., 0.), Point(1., 0.2), 50, 10, 'crossed') # h = 1/N
 V = FunctionSpace(mesh, 'P', 1)
 
 # Define boundary condition
-u_D = Expression('1 + x[0]*x[0] + 2*x[1]*x[1]', degree=2)
+u_D = Expression('exp(-2.*x[0])*sin(pi*x[1]/0.2)', degree=4)
 
 def boundary(x, on_boundary):
     return on_boundary
@@ -26,36 +19,27 @@ def boundary(x, on_boundary):
 bc = DirichletBC(V, u_D, boundary)
 
 # Define variational problem
+D = Constant(1E-2)
+a = Constant((1., 0.))
+r = Constant(2.)
 u = TrialFunction(V)
 v = TestFunction(V)
-f = Constant(-6.0)
-a = dot(grad(u), grad(v))*dx
+f = Expression('(pow(pi, 2.)/4. - 4E-2)*exp(-2.*x[0])*sin(pi*x[1]/0.2)', degree=2)
+B = dot(D*grad(u), grad(v))*dx - dot(u*a, grad(v))*dx + r*u*v*dx
 L = f*v*dx
 
 # Compute solution
-u = Function(V)
-solve(a == L, u, bc)
-
-# Plot solution and mesh
-plot(u)
-plot(mesh)
+u = Function(V, name='concentration')
+solve(B == L, u, bc)
 
 # Save solution to file in VTK format
-vtkfile = File('poisson/solution.pvd')
+vtkfile = File('transport/solution.pvd')
 vtkfile << u
 
-# Compute error in L2 norm
+# Compute error in L2-norm and H1-norm
 error_L2 = errornorm(u_D, u, 'L2')
-
-# Compute maximum error at vertices
-vertex_values_u_D = u_D.compute_vertex_values(mesh)
-vertex_values_u = u.compute_vertex_values(mesh)
-import numpy as np
-error_max = np.max(np.abs(vertex_values_u_D - vertex_values_u))
+error_H1 = errornorm(u_D, u, 'H1')
 
 # Print errors
 print('error_L2  =', error_L2)
-print('error_max =', error_max)
-
-# Hold plot
-interactive()
+print('error_H1  =', error_H1)
