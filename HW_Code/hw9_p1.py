@@ -36,18 +36,16 @@ f = Expression('(t <= 1.0) ? 200.*exp(-5.*x[0]*x[0] - 2.*x[1]*x[1]) : 0', degree
 tsteps = 500 # number of time steps
 dt = (T-t0) / tsteps # time step size
 
-# Theta method
-theta = 0.
 
 # Define the variational problem
 u = TrialFunction(V)
 v = TestFunction(V)
-B = u*v*dx + dt*a*dot(theta*grad(u) + (1-theta)*grad(u0), grad(v))*dx
+B = u*v*dx + dt*a*dot(grad(u), grad(v))*dx
 
 # Export the initial data
 u = Function(V, name='Temperature')
 u.assign(u0)
-results = File('heat/forwardEuler.pvd')
+results = File('heat/backwardEuler.pvd')
 results << (u, t)
 
 # Time stepping
@@ -58,9 +56,8 @@ for k in range(tsteps):
     print('Step = ', k+1, '/', tsteps , 'Time =', t)
 
     # Assemble the right hand side
-    # f0 = f
     f.t = t
-    L = (u0 + theta*dt*f + (1-theta)*dt*f)*v*dx
+    L = (u0 + dt*f)*v*dx
 
     # Compute the solution
     solve(B == L, u)
