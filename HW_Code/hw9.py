@@ -25,7 +25,7 @@ V = FunctionSpace(mesh, 'P', 1)
 
 # Problem data
 t0 = 0.0 # initial time
-T =  5.0# final time
+T =  0.1# final time
 t = t0 # current time
 a = Constant(0.1) # thermal conductivity
 u0 = interpolate(Constant(20.), V) # initial temperature
@@ -34,11 +34,11 @@ f0 = Expression('(t <= 1.0) ? 200.*exp(-5.*x[0]*x[0] - 2.*x[1]*x[1]) : 0', degre
 # Hint: Don't forget to wrap constant functions in a Constant(...).
 
 # Parameters of the time-stepping scheme
-tsteps = 500 # number of time steps
+tsteps = 1000 # number of time steps
 dt = (T-t0) / tsteps # time step size
 
 # Theta method
-theta = 0.5
+theta = 0.0
 
 # Define the variational problem
 u = TrialFunction(V)
@@ -48,7 +48,7 @@ B = u*v*dx + dt*a*dot(Constant(theta)*grad(u), grad(v))*dx
 # Export the initial data
 u = Function(V, name='Temperature')
 u.assign(u0)
-results = File('heat/CrankNicholson.pvd')
+results = File('heat/forwardEuler1000.pvd')
 results << (u, t)
 
 # Time stepping
