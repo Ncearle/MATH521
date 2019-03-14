@@ -30,6 +30,7 @@ t = t0 # current time
 a = Constant(0.1) # thermal conductivity
 u0 = interpolate(Constant(20.), V) # initial temperature
 f = Expression('(t <= 1.0) ? 200.*exp(-5.*x[0]*x[0] - 2.*x[1]*x[1]) : 0', degree=2, t = t) # source term
+f0 = Expression('(t <= 1.0) ? 200.*exp(-5.*x[0]*x[0] - 2.*x[1]*x[1]) : 0', degree=2, t = t)
 # Hint: Don't forget to wrap constant functions in a Constant(...).
 
 # Parameters of the time-stepping scheme
@@ -37,30 +38,31 @@ tsteps = 500 # number of time steps
 dt = (T-t0) / tsteps # time step size
 
 # Theta method
-theta = 0.
+theta = 0.5
 
 # Define the variational problem
 u = TrialFunction(V)
 v = TestFunction(V)
-B = u*v*dx + dt*a*dot(theta*grad(u) + (1-theta)*grad(u0), grad(v))*dx
+B = u*v*dx + dt*a*dot(Constant(theta)*grad(u), grad(v))*dx
 
 # Export the initial data
 u = Function(V, name='Temperature')
 u.assign(u0)
-results = File('heat/forwardEuler.pvd')
+results = File('heat/CrankNicholson.pvd')
 results << (u, t)
 
 # Time stepping
 for k in range(tsteps):
 
+    f0.t = t
     # Current time
     t = t0 + (k+1)*dt
     print('Step = ', k+1, '/', tsteps , 'Time =', t)
 
     # Assemble the right hand side
-    # f0 = f
     f.t = t
-    L = (u0 + theta*dt*f + (1-theta)*dt*f)*v*dx
+    L = (u0 + Constant(dt)*(Constant(theta)*f + Constant(1-theta)*f0))*v*dx - \
+        Constant(dt)*a*dot(Constant(1-theta)*grad(u0), grad(v))*dx
 
     # Compute the solution
     solve(B == L, u)
