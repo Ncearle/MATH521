@@ -31,7 +31,7 @@ v0 = interpolate(Constant(0.), V) # initial velocity
 # Parameters of the time-stepping scheme
 tsteps = 500 # number of time steps
 dt = T/tsteps # time step size
-theta = 1. # degree of implicitness
+theta = 0. # degree of implicitness
 
 # Define the variational problem
 w = TrialFunction(V) # w = u in the 1st equation and w = v in the 2nd equation
@@ -55,7 +55,7 @@ u.assign(u0)
 v.assign(v0)
 
 # Write initial data to file
-displacement = File('wave/thetaBE.pvd')
+displacement = File('wave/thetaFE.pvd')
 displacement << (u, t)
 
 # Time stepping
