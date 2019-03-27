@@ -6,8 +6,7 @@ boundary conditions.
 
 from fenics import *
 from mshr import *
-import time
-start = time.time()
+
 # Create a mesh on the unit disk
 disk = Circle(Point(0., 0.), 1.)
 mesh = generate_mesh(disk, 100) # h ~ 1/50
@@ -42,11 +41,33 @@ B2 = w*z*dx # LHS of the 2nd equation
 A1 = assemble(B1)
 A2 = assemble(B2)
 
-solver1 = LUSolver(A1)
-solver1.parameters['symmetric'] = True # True for Cholesky, False for LU
-solver2 = LUSolver(A2)
-solver2.parameters['symmetric'] = True # True for Cholesky, False for LU
+# directSolver1 = LUSolver(A1)
+# directSolver1.parameters['symmetric'] = True # True for Cholesky, False for LU
+# directSolver2 = LUSolver(A2)
+# directSolver2.parameters['symmetric'] = True # True for Cholesky, False for LU
 
+iterativeSolver1 = KrylovSolver(A1, 'gmres', 'icc')
+iterativeSolver2 = KrylovSolver(A2, 'gmres', 'icc')
+
+# Parameters for the iterative solver
+abstol = 10 ** -9
+reltol = 10 ** -6
+maxiter = 1000
+iterativeSolver1.parameters['nonzero_initial_guess'] = True
+iterativeSolver2.parameters['nonzero_initial_guess'] = True
+
+iterativeSolver1.parameters['absolute_tolerance'] = abstol
+iterativeSolver2.parameters['absolute_tolerance'] = abstol
+iterativeSolver1.parameters['relative_tolerance'] = reltol
+iterativeSolver2.parameters['relative_tolerance'] = reltol
+iterativeSolver1.parameters['maximum_iterations'] = maxiter
+iterativeSolver2.parameters['maximum_iterations'] = maxiter
+
+iterativeSolver1.parameters['monitor_convergence'] = True
+iterativeSolver2.parameters['monitor_convergence'] = True
+
+bc.apply(A1)
+bc.apply(A2)
 
 # Set initial data
 u = Function(V, name='Displacement')
@@ -68,17 +89,19 @@ for k in range(tsteps):
     # System for the displacement
     L1 = ((u0 + dt*v0)*z - Constant(theta*(1.-theta)*(dt*c)**2)*dot(grad(u0),grad(z)))*dx
     b1 = assemble(L1)
-    bc.apply(A1,b1)
-    solver1.solve(u.vector(), b1)
-    # solver1.set_operator(A1)
+    bc.apply(b1)
+    # directSolver1.solve(u.vector(), b1)
+    iterativeSolver1.solve(u.vector(), b1)
+    # directSolver1.set_operator(A1)
     # solve(B1 == L1, u, bc)
 
     # System for the velocity
     L2 = (v0*z - Constant(dt*c**2)*dot(grad(Constant(theta)*u + Constant(1.-theta)*u0), grad(z)))*dx
     b2 = assemble(L2)
-    bc.apply(A2,b2)
-    solver2.solve(v.vector(), b2)
-    # solver2.set_operator(A2)
+    bc.apply(b2)
+    # directSolver2.solve(v.vector(), b2)
+    iterativeSolver2.solve(v.vector(), b2)
+    # directSolver2.set_operator(A2)
     # solve(B2 == L2, v, bc)
 
     # Write data to file
@@ -87,7 +110,3 @@ for k in range(tsteps):
     # Update
     u0.assign(u)
     v0.assign(v)
-
-end = time.time()
-print("Total time: ")
-print(end-start)
