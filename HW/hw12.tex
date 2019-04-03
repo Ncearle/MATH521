@@ -1,0 +1,144 @@
+\documentclass[10pt,letterpaper]{scrartcl}
+\usepackage{amsfonts,amsmath,amssymb}
+\usepackage{dsfont,fontawesome}
+\usepackage{braket,mathtools,siunitx}
+\usepackage[hidelinks]{hyperref}
+\usepackage{textcomp,url}
+\usepackage{xcolor,framed,graphicx,tikz,pgfplots}
+\definecolor{shadecolor}{rgb}{0.9,0.9,0.9}
+\usetikzlibrary{arrows}
+\pgfplotsset{compat=1.12}
+\usepackage{listings,enumerate}
+\usepackage{booktabs,tabularx,longtable,multicol}
+\usepackage[inner=2cm,outer=2cm,top=2cm,bottom=2.3cm]{geometry}
+
+\pagestyle{empty}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+
+\newcommand{\dx}{\;\mathrm{d}x}
+\newcommand{\ds}{\;\mathrm{d}s}
+\renewcommand{\div}{\operatorname{div}}
+
+\begin{document}
+
+\begin{minipage}{.2\textwidth}
+\includegraphics[width=42pt]{ubc-logo.png}
+\end{minipage}
+\hfill
+\begin{minipage}{.75\textwidth}
+\setlength{\parskip}{6pt}
+\begin{flushright}
+{
+\sffamily
+\textbf{MATH521: Numerical Analysis of Partial Differential Equations}\\
+Winter 2018/19, Term 2
+
+Due Date: Friday, 5 April 2019\\
+Timm Treskatis
+}
+\end{flushright}
+\end{minipage}
+
+\section*{Homework Assignment 12}
+
+Please submit the following files as indicated below: \hfill \faFileCodeO \: source code \hfill \faFilePdfO \: PDF file \hfill \faFilePictureO \: image file \hfill \faFileMovieO \: video file
+
+\paragraph*{Question 1 $\vert$ 2 marks $\vert$ \faFilePdfO}
+
+If we discretise a linear convection\footnote{For mathematicians, convection = advection + diffusion.} equation, such as the heat equation, the advection-diffusion equation or the first-order hyperbolic advection equation, with the $\theta$-scheme in time and finite differences, finite elements or finite volumes in space, then we typically obtain a fully discrete scheme of the form
+\begin{equation*}
+\left( M^h + \Delta t \theta C^h \right) \vec{u}^h_+ = \left( M^h - \Delta t (1-\theta) C^h \right) \vec{u}^h_\circ + \vec{r}^h
+\end{equation*}
+with a strictly diagonally dominant mass matrix $M^h \geq 0$, a weakly chained diagonally dominant $L$-matrix $C^h$ and a source term $\vec{r}^h \geq 0$.
+
+This iteration is called \emph{positivity preserving} if
+\begin{equation*}
+\vec{u}^h_\circ \geq 0 \quad \Longrightarrow \quad  \vec{u}^h_+ \geq 0.
+\end{equation*}
+
+Assuming that the sparsity pattern of the mass matrix $M^h$ is contained in the sparsity pattern of the discretised convection matrix $C^h$, i.e. $m_{ij}^h \neq 0 \Rightarrow c_{ij}^h \neq 0$, show that a sufficient condition for positivity preservation of the scheme is the time-step restriction
+\begin{equation*}
+\max_{i,j: c_{ij}^h < 0} \frac{m_{ij}^h}{\theta \lvert c_{ij}^h \rvert} < \Delta t < \min_{i} \frac{m_{ii}^h}{(1-\theta) c_{ii}^h}.
+\end{equation*}
+\newpage
+
+\mbox{}
+
+\vfill
+
+\paragraph*{Question 2 $\vert$ 3 marks $\vert$ \faFilePdfO}
+
+The Fisher equation
+\begin{align*}
+\frac{\partial u}{\partial t} -\Delta u &= u(1-u) && \text{in } Q = ]0,T[ \times \Omega\\
+u(0) &= u_0 && \text{in } \Omega\\
+\frac{\partial u}{\partial n} &= 0 && \text{on } \Sigma = ]0,T[ \times \partial\Omega
+\end{align*}
+is a semilinear reaction-diffusion equation that is used in mathematical biology to model the spread and growth of a population $u$ that lives in the domain $\Omega$. The term on the right hand side models logistic growth / decay for a system with a carrying capacity scaled to 1. It follows from Sobolev embeddings\footnote{On a sufficiently regular 2D or 3D domain, all functions $u\in H^1(\Omega)$ are also in $L^p(\Omega)$ for $p\leq 6$. In particular $u\in L^2(\Omega)$ and $u \in L^4(\Omega)$. The latter implies $u^2 \in L^2(\Omega)$, and hence $u(1-u) = u - u^2 \in L^2(\Omega)$} that the nonlinear source term $u(1-u) \in L^2(\Omega)$ provided that $u \in H^1(\Omega)$. Therefore, we may continue to work with the same function spaces that we already used for linear elliptic or parabolic PDEs.
+
+After a discretisation with an implicit $\theta$-scheme in time ($\theta > 0$), we are confronted with the following semilinear elliptic problem:
+\begin{shaded}
+Find the solution $u_+ \in V$ at the next time level such that for all $v \in V$
+\begin{align}
+\int\limits_\Omega u_+ v \dx + \Delta t \theta \left( \int\limits_\Omega \nabla u_+ \cdot \nabla v \dx - \int\limits_\Omega u_+(1-u_+)v \dx \right) = \langle f_\circ , v\rangle_{V^*, V} \label{eq:Rothe}
+\shortintertext{with the known right hand side}
+\langle f_\circ , v\rangle_{V^*, V} = \int\limits_\Omega u_\circ v \dx + \Delta t (1-\theta) \left( - \int\limits_\Omega \nabla u_\circ \cdot \nabla v \dx + \int\limits_\Omega u_\circ(1-u_\circ)v \dx\right).\nonumber
+\end{align}
+\end{shaded}
+If this is only a semi-discretisation, then $V = H^1(\Omega)$. If a conforming finite-element discretisation is applied in space, then $V = V^h \subset H^1(\Omega)$.
+
+\newpage
+
+Since \eqref{eq:Rothe} is not a linear equation, we cannot simply solve a big linear system $Au_+ = b$ for the next time step $u_+$. Instead, we now have to solve a big nonlinear system $F(u_+) = 0$ e.g. with Newton's method to compute $u_+$.
+\begin{shaded}
+\textsf{\bfseries Newton's method} for the solution of the nonlinear equation $F(u_+) = 0$
+\begin{enumerate}
+\item Start with an initial guess $u_+^0$ (normally $u_+^0=u_\circ$) and $n=0$.
+\item Given $u_+^n$, solve the linear problem
+\begin{equation}\label{eq:Newton}
+DF(u_+^n) \delta = -F(u_+^n).
+\end{equation}
+\item Update $u_+^{n+1} = u_+^n + \delta$.
+\item If a stopping criterion is met, e.g. if
+\begin{equation*}
+\lVert u_+^{n+1} - u_+^n \rVert_V \leq \text{abstol} + \text{reltol} \; \lVert u_+^{n+1} \rVert_V
+\end{equation*}
+then stop, else set $n \leftarrow n+1$ and go to step 2.
+\end{enumerate}
+If the initial guess is sufficiently close to the true solution, i.e. if $\lVert u_+^0 - u_+\rVert_V$ is sufficiently small, and if the (Fréchet) derivative $DF$ is invertible at the solution $u_+$ and Lipschitz continuous in a neighbourhood around it, then the Newton iterates $u_+^n$ converge to the exact solution $u_+$ at a locally quadratic rate.
+\end{shaded}
+
+We apply Newton's method to solve \eqref{eq:Rothe} for the next time step of Fisher's equation. Derive the weak form of the linear elliptic equation \eqref{eq:Newton} that you have to solve for the increment $\delta \in V$ in each Newton iteration.
+
+\newpage
+
+\mbox{}
+
+\vfill
+
+\paragraph*{Your Learning Progress $\vert$ 0 marks, but -1 mark if unanswered $\vert$ \faFilePdfO}
+What is the one most important thing that you have learnt from this assignment?
+
+% These lines are just here for the folks who submit handwritten answers. As you seem to type up your answers, just delete the lines :)
+\vspace*{3mm}
+\hrulefill
+
+\vspace*{3mm}
+\hrulefill
+
+\vspace*{3mm}
+\hrulefill
+
+What is the most substantial new insight that you have gained from this course this week? Any \emph{aha moment}?
+
+\vspace*{3mm}
+\hrulefill
+
+\vspace*{3mm}
+\hrulefill
+
+\vspace*{3mm}
+\hrulefill
+
+\end{document}

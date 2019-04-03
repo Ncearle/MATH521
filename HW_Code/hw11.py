@@ -30,7 +30,7 @@ v0 = interpolate(Constant(0.), V) # initial velocity
 # Parameters of the time-stepping scheme
 tsteps = 500 # number of time steps
 dt = T/tsteps # time step size
-theta = 0. # degree of implicitness
+theta = 0.5 # degree of implicitness
 
 # Define the variational problem
 w = TrialFunction(V) # w = u in the 1st equation and w = v in the 2nd equation
@@ -41,15 +41,22 @@ B2 = w*z*dx # LHS of the 2nd equation
 A1 = assemble(B1)
 A2 = assemble(B2)
 
+bc.apply(A1)
+bc.apply(A2)
+
+# Solvers
+
 # directSolver1 = LUSolver(A1)
-# directSolver1.parameters['symmetric'] = True # True for Cholesky, False for LU
 # directSolver2 = LUSolver(A2)
+
+iterativeSolver1 = KrylovSolver(A1, 'gmres', 'jacobi')
+iterativeSolver2 = KrylovSolver(A2, 'gmres', 'jacobi')
+
+# Parameters for the solvers
+
 # directSolver2.parameters['symmetric'] = True # True for Cholesky, False for LU
+# directSolver1.parameters['symmetric'] = True # True for Cholesky, False for LU
 
-iterativeSolver1 = KrylovSolver(A1, 'gmres', 'icc')
-iterativeSolver2 = KrylovSolver(A2, 'gmres', 'icc')
-
-# Parameters for the iterative solver
 abstol = 10 ** -9
 reltol = 10 ** -6
 maxiter = 1000
@@ -63,11 +70,12 @@ iterativeSolver2.parameters['relative_tolerance'] = reltol
 iterativeSolver1.parameters['maximum_iterations'] = maxiter
 iterativeSolver2.parameters['maximum_iterations'] = maxiter
 
-iterativeSolver1.parameters['monitor_convergence'] = True
-iterativeSolver2.parameters['monitor_convergence'] = True
+iterativeSolver1.parameters['monitor_convergence'] = False
+iterativeSolver2.parameters['monitor_convergence'] = False
+# -------------------------------------------------------
+# I guess I just really want it to stop at some point :)
+# -------------------------------------------------------
 
-bc.apply(A1)
-bc.apply(A2)
 
 # Set initial data
 u = Function(V, name='Displacement')
@@ -76,7 +84,7 @@ u.assign(u0)
 v.assign(v0)
 
 # Write initial data to file
-displacement = File('wave/thetaFE.pvd')
+displacement = File('wave/thetaCN_IterativeGMRESjacobi.pvd')
 displacement << (u, t)
 
 # Time stepping
@@ -110,3 +118,5 @@ for k in range(tsteps):
     # Update
     u0.assign(u)
     v0.assign(v)
+
+# list_krylov_solver_preconditioners()
