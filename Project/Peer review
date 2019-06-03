@@ -1,0 +1,12 @@
+MATH 521 Peer Review
+	Mesh Optimization for Finite Elements
+
+In this project, "Mesh Optimization for Finite Elements", the objectives are clear, to provide a means of optimizing finite elements to improve the quality of the mesh. To show how this optimization might work, the author used an annulus as a domain, as well as four different meshes, one unstructured, and 3 structured meshes: one of trapezoids divided into triangles, this mesh smoothed using 20 iterations of Laplacian smoothing, and the optimized mesh. A test problem was then solved, and results compared to see what effect different meshes have on the outcome. This is a significant issue in numerical analysis because, as the author mentions, refining a mesh increases computational cost at O(N^3), while mesh optimization can have similar benefits without any additional cost. 
+
+Overall, I thought the report did a good job of briefly summarizing the issues at hand and describing the problem and possible solutions. However, that being said, it may have been a bit too brief, and would benefit from some elaboration in areas and discussion.
+
+One thing that the author did quite well was the problem definition, and using a test case that was both easy to understand yet provided some challenge to the optimization. And while the test function may not have provided clear answers, using a new one is a rather trivial exercise. The code written for the optimization and all was also quite good, efficient and easy to read, but could possibly use some comments for others to come in and develop.
+
+One thing that I think the author could add is a section detailing how the optimization works, i.e. we are looking for in mesh quality and how we can achieve this. While equation 1 does show the objective function for optimizing the mesh, just clarifying how this actually optimizes the mesh would help. Also, as mentioned above, a brief discussion of the results would be of benefit, just to summarize and clarify what is expected, what happened, and reasons for why. 
+
+As a final thought, I did find it quite interesting just how much the interpolation error increased as a result of the Laplacian smoothing, it made it seem like the usual "catch-all mesh fixer" wouldn't work well, but it did provide results as expected. For future work, I do believe solving a problem where the interpolation error is dominant is key to getting more definitive results.
